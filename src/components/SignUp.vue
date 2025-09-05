@@ -1,5 +1,29 @@
 <script setup>
+import httpService from "@/server";
+import { onMounted } from 'vue';
 
+onMounted(() => {
+    // httpService.post("users", {
+    //     username: "amir555",
+    //     password: "123456",
+    //     displayName: "Amir",
+    //     avatar: "uuu"
+    // })
+
+    // httpService.post("login", {
+    //     username: "amir555",
+    //     password: "123456"
+    // })
+
+
+    httpService.get("users/me")
+    .then(res => {
+        for (let key in res.data) {
+            console.log(key, res.data[key]);
+        }
+    })
+    
+})
 </script>
 
 <template>

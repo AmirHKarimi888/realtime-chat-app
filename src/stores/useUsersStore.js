@@ -25,6 +25,7 @@ export const useUsersStore = defineStore('users', () => {
                             })
                     })
             })
+            .catch(err => console.error(err.message))
     }
 
     const signIn = async (values) => {
@@ -38,6 +39,7 @@ export const useUsersStore = defineStore('users', () => {
                         signedInUser.value = res.data;
                     })
             })
+            .catch(err => console.error(err.message))
     }
 
     const signOut = async() => {

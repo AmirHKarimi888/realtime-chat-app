@@ -1,12 +1,9 @@
 <script setup>
 import { onMounted } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
-import httpService from "@/server";
 import { useUsersStore } from './stores/useUsersStore';
-import { storeToRefs } from 'pinia';
 
 const usersStore = useUsersStore();
-const { signedInUser } = storeToRefs(usersStore);
 
 const router = useRouter();
 
@@ -18,12 +15,6 @@ onMounted(() => {
   } else {
     document.querySelector("body").classList.remove("dark");
   }
-
-  httpService.get("users/me")
-    .then(res => {
-      signedInUser.value = res.data;
-    })
-    .catch(err => console.error(err.message))
 })
 
 const toggleDarkMode = () => {
@@ -37,9 +28,9 @@ const toggleDarkMode = () => {
 }
 
 const { signOut } = usersStore;
-const signOutUser = async() => {
+const signOutUser = async () => {
   await signOut()
-  .then(() => router.push("/signin"))
+    .then(() => router.push("/signin"))
 }
 </script>
 

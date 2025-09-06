@@ -41,7 +41,8 @@ export const useUsersStore = defineStore('users', () => {
     }
 
     const signOut = async() => {
-        await httpService.post('/logout')
+        await httpService.post('logout')
+        .then(() => signedInUser.value = "")
         .catch(err => console.error(err.message))
     }
 

@@ -1,24 +1,43 @@
 import axios from "axios";
 
-class httpService {
+class HttpService {
+  constructor(baseURL) {
+    this.url = baseURL.replace(/\/+$/, ""); // remove trailing slashes
+  }
 
-    constructor(url) {
-        this.url = url;
-    }
+  buildUrl(endpoint) {
+    return `${this.url}/${endpoint.replace(/^\/+/, "")}`; // remove leading slashes
+  }
 
-    async get(endpoint, headers) {
-        return await axios.get(`${this.url}/${endpoint}`, {
-            headers: headers,
-            withCredentials: true
-        })
-    }
+  async get(endpoint, headers) {
+    return await axios.get(this.buildUrl(endpoint), {
+      headers,
+      withCredentials: true,
+    });
+  }
 
-    async post(endpoint, body, headers) {
-        return await axios.post(`${this.url}/${endpoint}`, body, {
-            headers: headers,
-            withCredentials: true
-        });
-    }
+  async post(endpoint, body, headers) {
+    return await axios.post(this.buildUrl(endpoint), body, {
+      headers,
+      withCredentials: true,
+    });
+  }
+
+  async put(endpoint, body, headers) {
+    return await axios.put(this.buildUrl(endpoint), body, {
+      headers,
+      withCredentials: true,
+    });
+  }
+
+  async delete(endpoint, headers) {
+    return await axios.delete(this.buildUrl(endpoint), {
+      headers,
+      withCredentials: true,
+    });
+  }
 }
 
-export default new httpService("http://localhost:4000");
+// usage
+const httpService = new HttpService("http://localhost:4000");
+export default httpService;

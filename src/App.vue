@@ -2,8 +2,11 @@
 import { onMounted } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
 import { useUsersStore } from './stores/useUsersStore';
+import { storeToRefs } from 'pinia';
 
 const usersStore = useUsersStore();
+
+const { signedInUser } = storeToRefs(usersStore);
 
 const router = useRouter();
 
@@ -39,6 +42,9 @@ const signOutUser = async () => {
     <button @click="toggleDarkMode">toggleDarkMode</button>
     <br /><br />
     <button @click="signOutUser">Sign Out</button>
+    <br><br><br><br>
+    <img :src="signedInUser?.defaultAvatar" alt="">
+    <img :src="`http://localhost:4000${signedInUser?.avatar}`" alt="">
   </header>
 
   <main>

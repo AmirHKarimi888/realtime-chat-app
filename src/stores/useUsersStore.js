@@ -8,23 +8,24 @@ export const useUsersStore = defineStore('users', () => {
 
     const signUp = async (values) => {
         try {
+            const fd = new FormData();
+            fd.append('username', values.username);
+            fd.append('password', values.password);
+            fd.append('displayName', values.displayName || '');
+            fd.append('defaultAvatar', useGenerateAvatar(values?.username).avatarUrl);
+            
+            // Always append avatar field, even if it's empty or a file
             if (values.avatarFile) {
-                const fd = new FormData();
-                fd.append('username', values.username);
-                fd.append('password', values.password);
-                if (values.displayName) fd.append('displayName', values.displayName);
-                fd.append('defaultAvatar', useGenerateAvatar(values?.username).avatarUrl);
                 fd.append('avatar', values.avatarFile);
-                await httpService.post('users', fd);
             } else {
-                await httpService.post('users', {
-                    username: values.username,
-                    password: values.password,
-                    displayName: values.displayName || undefined,
-                    defaultAvatar: useGenerateAvatar(values?.username).avatarUrl,
-                    avatar: ''
-                });
+                fd.append('avatar', ''); // Send empty string if no file
             }
+
+            await httpService.post('users', fd, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
 
             // 🔑 Login after signup
             await httpService.post("login", {
@@ -37,9 +38,9 @@ export const useUsersStore = defineStore('users', () => {
 
         } catch (err) {
             console.error(err.message);
+            throw err; // Important: re-throw the error so the component can handle it
         }
     };
-
 
     const signIn = async (values) => {
         await httpService.post("login", {

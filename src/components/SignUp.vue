@@ -12,6 +12,8 @@ const router = useRouter();
 const showPassword = ref(false);
 const showPasswordConfirm = ref(false);
 
+//const avatarFile = ref(null);
+
 const schema = yup.object({
     displayName: yup
         .string()
@@ -37,11 +39,28 @@ const schema = yup.object({
         .oneOf([yup.ref("password")], "Passwords must match"),
 });
 
+// function onFileChange(e) {
+//   const file = e.target.files[0];
+//   if (!file) return;
+  
+//   // optional: check file size (e.g., max 2MB)
+//   if (file.size > 2 * 1024 * 1024) {
+//     alert('File is too large! Max 2MB.');
+//     return;
+//   }
+  
+//   avatarFile.value = file;
+// }
+
 const { signUp } = usersStore;
 const signUpUser = async(values) => {
     await signUp(values)
     .then(() => router.push("/"))
 }
+// const signUpUser = async(values) => {
+//     await signUp({...values, avatarFile})
+//     .then(() => router.push("/"))
+// }
 </script>
 
 <template>
@@ -80,6 +99,9 @@ const signUpUser = async(values) => {
                 </div>
                 <ErrorMessage name="passwordConfirm" class="text-xs text-red-500" />
             </div>
+            <!--<div>
+                <input type="file" @change="onFileChange" accept="image/*" />
+            </div>-->
             <div>
                 <button
                     class="bg-pink-600 px-2 py-1 rounded-md text-sm items-center text-white cursor-pointer hover:bg-pink-500 duration-150">Sign

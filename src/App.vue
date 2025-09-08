@@ -3,8 +3,11 @@ import { onMounted } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
 import { useUsersStore } from './stores/useUsersStore';
 import { storeToRefs } from 'pinia';
+import { useSocketStore } from './stores/useSocketStore';
+import { onUnmounted } from 'vue';
 
 const usersStore = useUsersStore();
+const socketStore = useSocketStore();
 
 const { signedInUser } = storeToRefs(usersStore);
 
@@ -18,7 +21,17 @@ onMounted(() => {
   } else {
     document.querySelector("body").classList.remove("dark");
   }
+
+  // Connect socket when user is logged in
+  if (signedInUser.value) {
+    // You might need to get the token from cookies or store
+    socketStore.connect();
+  }
 })
+
+onUnmounted(() => {
+  socketStore.disconnect();
+});
 
 const toggleDarkMode = () => {
   if (JSON.parse(localStorage.getItem("isDarkMode"))) {
@@ -43,8 +56,8 @@ const signOutUser = async () => {
     <br /><br />
     <button @click="signOutUser">Sign Out</button>
     <br><br><br><br>
-    <img :src="signedInUser?.defaultAvatar" alt="">
-    <img :src="`http://localhost:4000${signedInUser?.avatar}`" alt="">
+    <img :src="signedInUser?.defaultAvatar" alt="User Avatar" loading="lazy">
+    <img width="60" :src="`http://localhost:4000${signedInUser?.avatar}`" alt="User avatar" loading="lazy" />
   </header>
 
   <main>

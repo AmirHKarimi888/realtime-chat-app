@@ -6,6 +6,7 @@ import { storeToRefs } from 'pinia';
 import { useSocketStore } from './stores/useSocketStore';
 import { onUnmounted } from 'vue';
 import { watch } from 'vue';
+import httpService from './server';
 
 const usersStore = useUsersStore();
 const socketStore = useSocketStore();
@@ -80,7 +81,7 @@ const signOutUser = async () => {
     <button @click="signOutUser">Sign Out</button>
     <br><br><br><br>
     <img :src="signedInUser?.defaultAvatar" alt="User Avatar" loading="lazy">
-    <img width="60" :src="`http://localhost:4000${signedInUser?.avatar}`" alt="User avatar" loading="lazy" />
+    <img width="60" :src="`${httpService.url}${signedInUser?.avatar}`" alt="User avatar" loading="lazy" />
   </header>
 
   <main>

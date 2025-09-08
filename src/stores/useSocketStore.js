@@ -27,9 +27,9 @@ export const useSocketStore = defineStore('socket', () => {
       console.log('Socket disconnected');
     });
 
-    socket.value.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
-    });
+    // socket.value.on('connect_error', (error) => {
+    //   console.error('Socket connection error:', error);
+    // });
 
     // User status events
     socket.value.on('user:online', (userId) => {

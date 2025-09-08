@@ -9,7 +9,7 @@
         </div>
 
         <div>
-            
+            No messages yet...
         </div>
     </div>
 </template>

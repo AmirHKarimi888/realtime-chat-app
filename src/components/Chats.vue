@@ -1,97 +1,35 @@
-<!--eslint-disable-->
 <script setup>
-import httpService from '@/server';
+import { onMounted, ref } from 'vue';
 import UserSearch from './UserSearch.vue';
+import ChatsUsersList from './ChatsUsersList.vue';
 import { useSearchStore } from '@/stores/useSearchStore';
 import { storeToRefs } from 'pinia';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
-import { useSocketStore } from '@/stores/useSocketStore';
 
 const searchStore = useSearchStore();
-const socketStore = useSocketStore();
 
 const { searchQuery, searchResults } = storeToRefs(searchStore);
-const { socket } = storeToRefs(socketStore);
 
+const childRef = ref(null);
 const loading = ref(false);
 
-
-const handleSearch = async () => {
-    if (!searchQuery.value.length) {
-        searchResults.value = [];
-        return;
-    }
-
-    loading.value = true;
-    try {
-        const response = await httpService.get(`users/search?q=${encodeURIComponent(searchQuery.value)}`);
-        searchResults.value = response.data;
-    } catch (error) {
-        console.error('Search failed:', error);
-        searchResults.value = [];
-    } finally {
-        loading.value = false;
-    }
-}
-
-// watch(searchQuery, async () => {
-//     await handleSearch();
-// })
-
-// Debounce search to avoid too many requests
-let searchTimeout = null;
-const debouncedSearch = () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(handleSearch, 300);
-};
-
-// Watch search query with debounce
-watch(searchQuery, debouncedSearch);
-
-
-
-// Add socket event listeners for real-time updates
 onMounted(() => {
-  if (socket.value) {
-    socket.value.on('user:online', handleUserOnline);
-    socket.value.on('user:offline', handleUserOffline);
+  if (childRef.value) {
+    loading.value = childRef.value.loading;
   }
-});
-
-onUnmounted(() => {
-  if (socket.value) {
-    socket.value.off('user:online', handleUserOnline);
-    socket.value.off('user:offline', handleUserOffline);
-  }
-});
-
-const handleUserOnline = (userId) => {
-  // Update status in search results
-  const userIndex = searchResults.value.findIndex(u => u.id === userId);
-  if (userIndex !== -1) {
-    searchResults.value[userIndex].isOnline = true;
-  }
-};
-
-const handleUserOffline = (userId) => {
-  // Update status in search results
-  const userIndex = searchResults.value.findIndex(u => u.id === userId);
-  if (userIndex !== -1) {
-    searchResults.value[userIndex].isOnline = false;
-    searchResults.value[userIndex].lastSeen = Date.now();
-  }
-};
+})
 </script>
 
 <template>
     <div>
         <div>
-            <UserSearch />
+            <UserSearch ref="childRef" />
         </div>
 
         <div>
             <div v-if="loading">loading...</div><br><br><br>
-            <div v-if="!loading">{{ searchResults }}</div>
+            <div v-if="!loading">
+              <ChatsUsersList :usersList="searchQuery ? searchResults : []" />
+            </div>
         </div>
     </div>
 </template>

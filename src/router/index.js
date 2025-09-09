@@ -15,25 +15,25 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  const userStore = useUsersStore()
+  const usersStore = useUsersStore()
 
   // if signedInUser is empty, try fetching from backend
-  if (!userStore.signedInUser) {
+  if (!usersStore.signedInUser) {
     try {
       const res = await httpService.get("users/me")
-      userStore.signedInUser = res.data
+      usersStore.signedInUser = res.data
     } catch {
-      userStore.signedInUser = ""
+      usersStore.signedInUser = ""
     }
   }
 
   // protect routes requiring auth
-  if (to.meta.requiresAuth && !userStore.signedInUser) {
+  if (to.meta.requiresAuth && !usersStore.signedInUser) {
     return next({ name: 'SignIn' })
   }
 
   // redirect logged-in users away from login/signup pages
-  if ((to.name === 'SignIn' || to.name === 'SignUp') && userStore.signedInUser) {
+  if ((to.name === 'SignIn' || to.name === 'SignUp') && usersStore.signedInUser) {
     return next({ name: 'Home' })
   }
 

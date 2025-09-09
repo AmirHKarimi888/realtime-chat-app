@@ -7,6 +7,7 @@ import { useSocketStore } from './stores/useSocketStore';
 import { onUnmounted } from 'vue';
 import { watch } from 'vue';
 import httpService from './server';
+import Header from './components/Header.vue';
 
 const usersStore = useUsersStore();
 const socketStore = useSocketStore();
@@ -39,9 +40,9 @@ onMounted(() => {
   if (!localStorage.getItem("isDarkMode")) localStorage.setItem("isDarkMode", window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? true : false);
 
   if (JSON.parse(localStorage.getItem("isDarkMode"))) {
-    document.querySelector("body").classList.add("dark");
+    document.querySelector("html").classList.add("dark");
   } else {
-    document.querySelector("body").classList.remove("dark");
+    document.querySelector("html").classList.remove("dark");
   }
 
   // Connect if user is already logged in
@@ -57,40 +58,24 @@ onUnmounted(() => {
   socketStore.disconnect();
 });
 
-const toggleDarkMode = () => {
-  if (JSON.parse(localStorage.getItem("isDarkMode"))) {
-    document.querySelector("body").classList.remove("dark");
-    localStorage.setItem("isDarkMode", false);
-  } else {
-    document.querySelector("body").classList.add("dark");
-    localStorage.setItem("isDarkMode", true);
-  }
-}
 
-const { signOut } = usersStore;
-const signOutUser = async () => {
-  await signOut()
-    .then(() => router.push("/signin"))
-}
+
 </script>
 
 <template>
-  <header>
-    <button @click="toggleDarkMode">toggleDarkMode</button>
-    <br /><br />
-    <button @click="signOutUser">Sign Out</button>
-    <br><br><br><br>
-    <img :src="signedInUser?.defaultAvatar" alt="User Avatar" loading="lazy">
-    <img width="60" :src="`${httpService.url}${signedInUser?.avatar}`" alt="User avatar" loading="lazy" />
-  </header>
+  <div class="flex">
+    <header>
+      <Header />
+    </header>
 
-  <main>
-    <RouterView />
-  </main>
+    <main>
+      <RouterView />
+    </main>
 
-  <footer>
+    <footer>
 
-  </footer>
+    </footer>
+  </div>
 </template>
 
 <style scoped></style>

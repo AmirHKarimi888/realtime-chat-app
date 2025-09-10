@@ -1,21 +1,15 @@
 <script setup>
 import { onMounted } from 'vue';
-import { RouterView, useRouter } from 'vue-router';
 import { useUsersStore } from './stores/useUsersStore';
 import { storeToRefs } from 'pinia';
 import { useSocketStore } from './stores/useSocketStore';
 import { onUnmounted } from 'vue';
 import { watch } from 'vue';
-import httpService from './server';
-import Header from './components/Header.vue';
 
 const usersStore = useUsersStore();
 const socketStore = useSocketStore();
 
 const { signedInUser } = storeToRefs(usersStore);
-
-const router = useRouter();
-
 
 // Connect socket when user logs in
 watch(() => signedInUser.value, (newUser) => {
@@ -58,24 +52,10 @@ onUnmounted(() => {
   socketStore.disconnect();
 });
 
-
-
 </script>
 
 <template>
-  <div class="flex">
-    <header>
-      <Header />
-    </header>
-
-    <main>
-      <RouterView />
-    </main>
-
-    <footer>
-
-    </footer>
-  </div>
+  <main>
+    <RouterView />
+  </main>
 </template>
-
-<style scoped></style>

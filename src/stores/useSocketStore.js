@@ -68,6 +68,20 @@ export const useSocketStore = defineStore('socket', () => {
     });
 
     // Message events
+    socket.value.on('chatlist:refresh', () => {
+      console.log('Chat list refresh requested');
+      // Emit an event that your components can listen to
+      const event = new CustomEvent('chatlist-refresh');
+      window.dispatchEvent(event);
+    });
+
+    socket.value.on('chatlist:updated', (chatRooms) => {
+      console.log('Chat list updated received:', chatRooms);
+      // Update your chat store with the new rooms
+      const event = new CustomEvent('chatlist-updated', { detail: chatRooms });
+      window.dispatchEvent(event);
+    });
+
     socket.value.on('message:new', (message) => {
       console.log('New message received:', message);
       const chatStore = useChatStore();
@@ -109,6 +123,16 @@ export const useSocketStore = defineStore('socket', () => {
       connectionStatus.value = 'disconnected';
     }
   };
+
+  const getChatList = () => {
+    if (socket.value && isConnected.value) {
+      socket.value.emit('chatlist:get');
+      return true;
+    } else {
+      console.error('Cannot get chat list: Socket not connected');
+      return false;
+    }
+  }
 
   const getMessages = (roomId, limit = 50, before = null) => {
     if (socket.value && isConnected.value) {
@@ -181,6 +205,7 @@ export const useSocketStore = defineStore('socket', () => {
     connectionStatus: computed(() => connectionStatus.value),
     connect,
     disconnect,
+    getChatList,
     getMessages,
     sendMessage,
     editMessage,

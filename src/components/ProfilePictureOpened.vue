@@ -15,7 +15,7 @@ const profilePictureVisible = ref(false);
     <div>
         <img :src="signedInUser?.avatar ? `${httpService.url}${signedInUser?.avatar}` : `${signedInUser?.defaultAvatar}`"
             @click="profilePictureVisible = true" alt="User avatar" loading="lazy"
-            class="w-[70px] rounded-full cursor-pointer" />
+            class="w-[70px] aspect-square rounded-full cursor-pointer" />
 
         <div v-if="profilePictureVisible" @click="profilePictureVisible = false"
             class=" w-screen h-screen fixed top-0 left-0 bg-gray-600/40">

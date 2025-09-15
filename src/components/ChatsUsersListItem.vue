@@ -12,30 +12,27 @@ const props = defineProps({
 const user = ref(props.room.roomId ? props.room.participant : props.room);
 
 const chatStore = useChatStore();
-const { currentParticipant } = storeToRefs(chatStore);
+const { currentParticipant, currentRoom } = storeToRefs(chatStore);
 
 const usersStore = useUsersStore();
 
 //Get message
 const getMessages = async (participant) => {
   // Now we need to wait for the room to be created and refresh our chat list
-  await usersStore.loadChatRooms(); // Reload rooms to get the new one
 
   // Find the new room with this user
-  const chatRooms = usersStore.chatRooms;
-  const newRoom = chatRooms.find(room => room.participant.id === participant.id);
-
-  console.log(newRoom)
+  const newRoom = usersStore.chatRooms.find(room => room.participant.id === participant.id);
 
   if (newRoom) {
     // Open the new chat room
-    console.log(newRoom)
     chatStore.setCurrentChat(newRoom, newRoom.participant);
     await chatStore.loadRoomMessages(newRoom.roomId);
   }
 }
 
 const startChat = async (user) => {
+  currentParticipant.value = user;
+  currentRoom.value = null;
   await getMessages(user);
 };
 </script>

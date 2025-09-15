@@ -1,10 +1,11 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import UserSearch from './UserSearch.vue';
 import ChatsUsersList from './ChatsUsersList.vue';
 import { useSearchStore } from '@/stores/useSearchStore';
 import { storeToRefs } from 'pinia';
 import { useUsersStore } from '@/stores/useUsersStore';
+import { useSocketStore } from '@/stores/useSocketStore';
 
 const searchStore = useSearchStore();
 const { searchQuery, searchResults } = storeToRefs(searchStore);
@@ -12,9 +13,33 @@ const { searchQuery, searchResults } = storeToRefs(searchStore);
 const usersStore = useUsersStore();
 const { chatRooms } = storeToRefs(usersStore);
 
+const socketStore = useSocketStore();
+
 const childRef = ref(null);
 const loading = ref(false);
 
+// Method to refresh chat list
+const refreshChatList = async () => {
+  socketStore.getChatList();
+};
+
+// Listen for chat list updates
+const handleChatListUpdated = (event) => {
+  const chatRooms = event.detail;
+  // Update your local chat rooms state
+  usersStore.chatRooms = chatRooms;
+};
+
+onMounted(() => {
+  usersStore.loadChatRooms(); // Reload rooms to get the new one
+  window.addEventListener('chatlist-updated', handleChatListUpdated);
+  window.addEventListener('chatlist-refresh', refreshChatList)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('chatlist-updated', handleChatListUpdated);
+  window.removeEventListener('chatlist-refresh', refreshChatList);
+})
 </script>
 
 <template>

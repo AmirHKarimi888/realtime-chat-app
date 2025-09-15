@@ -4,6 +4,7 @@ import { useChatStore } from '@/stores/useChatStore';
 import { useSocketStore } from '@/stores/useSocketStore';
 import { storeToRefs } from 'pinia';
 import { useUsersStore } from '@/stores/useUsersStore';
+import ChatRoomMessagesList from './ChatRoomMessagesList.vue';
 
 const usersStore = useUsersStore();
 const { signedInUser } = storeToRefs(usersStore);
@@ -87,31 +88,27 @@ onUnmounted(() => {
 
 <template>
     <div class="flex flex-col w-full h-screen bg-gray-200 dark:bg-gray-900">
-        <div v-if="currentParticipant"
-            class="w-full h-[60px] bg-gray-50 dark:bg-gray-800 border-s border-gray-300 dark:border-gray-700">
 
-        </div>
+        <div class="w-full h-full flex flex-col justify-between items-center">
 
-        <div class="w-full h-full flex justify-center items-center">
-            <span v-if="!currentParticipant && !messages.length"
-                class="px-3 py-1 text-sm text-white bg-gray-700/40 rounded-full">Select a
-                chat</span>
-
-            <span v-if="currentParticipant && !messages.length"
-                class="px-3 py-1 text-sm text-white bg-gray-700/40 rounded-full">No messages yet...</span>
-
-            <div v-if="currentParticipant && messages.length">
-                <ul>
-                    {{ messages }}
-                </ul>
+            <div v-if="currentParticipant"
+                class="w-full h-[60px] bg-gray-50 dark:bg-gray-800 border-s border-gray-300 dark:border-gray-700">
             </div>
 
-            <div v-if="currentParticipant">
+            <div class="flex w-full h-full overflow-y-auto"
+                :class="messages.length ? 'justify-start items-start' : 'justify-center items-center'">
+                <span v-if="currentParticipant && !messages.length"
+                    class="px-3 py-1 text-sm text-white bg-gray-700/40 rounded-full">No messages yet...</span>
+
+                <div v-if="currentParticipant && messages.length">
+                    <ChatRoomMessagesList :messages="messages" />
+                </div>
+            </div>
+
+            <div v-if="currentParticipant" class="p-5 w-full">
                 <input type="text" v-model="messageInput" @input="handleInput">
                 <button @click="sendMessage">send</button>
             </div>
         </div>
-
-
     </div>
 </template>

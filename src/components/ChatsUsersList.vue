@@ -2,14 +2,14 @@
 import ChatsUsersListItem from './ChatsUsersListItem.vue';
 
 defineProps({
-    usersList: Object
+    chatRooms: Object
 })
 </script>
 
 <template>
     <div>
-        <ul v-for="user in usersList" :key="user.id" class="grid">
-            <ChatsUsersListItem :user="user" />
+        <ul v-for="room in chatRooms" :key="room.roomId" class="grid">
+            <ChatsUsersListItem :room="room" />
         </ul>
     </div>
 </template>

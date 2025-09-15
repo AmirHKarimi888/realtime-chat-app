@@ -85,8 +85,8 @@ const handleUserOffline = (userId) => {
 </script>
 
 <template>
-    <div class="search-box">
-        <input v-model="searchQuery" placeholder="Search users..." class="search-input"
+    <div class="search-box w-full h-[50px] flex justify-center items-center px-3">
+        <input v-model="searchQuery" placeholder="Search users..." class="search-input w-full px-2 py-1 rounded-full border border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-gray-600 text-sm"
             type="text" />
         <slot :loading="loading"></slot>
     </div>

@@ -13,9 +13,9 @@ const drawerVisible = ref(false);
             <DrawerContent />
         </Drawer>
 
-        <div class="w-[50px] h-screen flex justify-start items-start p-2">
-            <button @click="drawerVisible = true" class="cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+        <div class="w-[50px] h-screen bg-gray-900 flex justify-center items-start p-2 text-gray-100">
+            <button @click="drawerVisible = true" class="cursor-pointer mt-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                     viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
                     <path fill="currentColor" d="M3 18v-2h18v2zm0-5v-2h18v2zm0-5V6h18v2z" />
                 </svg>

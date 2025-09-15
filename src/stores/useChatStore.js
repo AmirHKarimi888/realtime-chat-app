@@ -1,0 +1,130 @@
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import httpService from '@/server';
+import { useSocketStore } from './useSocketStore';
+
+export const useChatStore = defineStore('chat', () => {
+    const currentRoom = ref(null);
+    const currentParticipant = ref(null);
+    const messages = ref([]);
+    const typingUsers = ref(new Set());
+    const loading = ref(false);
+    const error = ref(null);
+
+    // Load messages for a specific chat room
+    const loadRoomMessages = async (roomId) => {
+        try {
+            loading.value = true;
+            error.value = null;
+            const response = await httpService.get(`/messages/room/${roomId}`);
+            messages.value = response.data;
+            
+            return messages.value;
+        } catch (err) {
+            console.error('Error loading room messages:', err);
+            error.value = err.response?.data?.error || err.message;
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    // Set current chat room and participant
+    const setCurrentChat = (room, participant) => {
+        currentRoom.value = room;
+        currentParticipant.value = participant;
+        messages.value = []; // Clear previous messages
+    };
+
+    // Add a new message to the store
+    const addMessage = (message) => {
+        try {
+            // Only add if it belongs to the current room
+            if (currentRoom.value && message.roomId === currentRoom.value.roomId) {
+                // Check if message already exists
+                const exists = messages.value.some(m => m.id === message.id);
+                if (!exists) {
+                    messages.value.push(message);
+                    // Sort messages by timestamp
+                    messages.value.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                }
+            }
+        } catch (err) {
+            console.error('Error adding message:', err);
+        }
+    };
+
+    // Update an existing message
+    const updateMessage = (message) => {
+        const index = messages.value.findIndex(m => m.id === message.id);
+        if (index !== -1) {
+            messages.value[index] = { ...messages.value[index], ...message };
+        }
+    };
+
+    // Delete a message (soft delete)
+    const deleteMessage = (messageId) => {
+        const index = messages.value.findIndex(m => m.id === messageId);
+        if (index !== -1) {
+            // Either remove it or mark as deleted
+            messages.value[index].isDeleted = true;
+            messages.value[index].text = 'This message was deleted';
+        }
+    };
+
+    // Set typing status for a user
+    const setTyping = (userId, isTyping) => {
+        if (isTyping) {
+            typingUsers.value.add(userId);
+        } else {
+            typingUsers.value.delete(userId);
+        }
+    };
+
+    // Check if a user is typing
+    const isTyping = (userId) => {
+        return typingUsers.value.has(userId);
+    };
+
+    // Clear all messages and current chat
+    const clearChat = () => {
+        messages.value = [];
+        currentRoom.value = null;
+        currentParticipant.value = null;
+        typingUsers.value.clear();
+        error.value = null;
+    };
+
+    // Send a message
+    const sendMessage = (text) => {
+        if (!currentParticipant.value) {
+            throw new Error('No active chat');
+        }
+        
+        const socketStore = useSocketStore();
+        try {
+            socketStore.sendMessage(currentParticipant.value.id, text);
+        } catch (err) {
+            console.error('Error sending message:', err);
+            throw err;
+        }
+    };
+
+    return {
+        currentRoom,
+        currentParticipant,
+        messages: computed(() => messages.value),
+        typingUsers: computed(() => typingUsers.value),
+        loading: computed(() => loading.value),
+        error: computed(() => error.value),
+        loadRoomMessages,
+        setCurrentChat,
+        addMessage,
+        updateMessage,
+        deleteMessage,
+        setTyping,
+        isTyping,
+        clearChat,
+        sendMessage
+    };
+});

@@ -7,9 +7,13 @@ export const useChatStore = defineStore('chat', () => {
     const currentRoom = ref(null);
     const currentParticipant = ref(null);
     const messages = ref([]);
+    const messageInput = ref("");
+    const editingMessage = ref(null);
     const typingUsers = ref(new Set());
     const loading = ref(false);
     const error = ref(null);
+
+    const socketStore = useSocketStore();
 
     // Load messages for a specific chat room
     const loadRoomMessages = async (roomId) => {
@@ -18,7 +22,7 @@ export const useChatStore = defineStore('chat', () => {
             error.value = null;
             const response = await httpService.get(`/messages/room/${roomId}`);
             messages.value = response.data;
-            
+
             return messages.value;
         } catch (err) {
             console.error('Error loading room messages:', err);
@@ -62,16 +66,6 @@ export const useChatStore = defineStore('chat', () => {
         }
     };
 
-    // Delete a message (soft delete)
-    const deleteMessage = (messageId) => {
-        const index = messages.value.findIndex(m => m.id === messageId);
-        if (index !== -1) {
-            // Either remove it or mark as deleted
-            messages.value[index].isDeleted = true;
-            messages.value[index].text = 'This message was deleted';
-        }
-    };
-
     // Set typing status for a user
     const setTyping = (userId, isTyping) => {
         if (isTyping) {
@@ -95,25 +89,54 @@ export const useChatStore = defineStore('chat', () => {
         error.value = null;
     };
 
-    // Send a message
-    const sendMessage = (text) => {
-        if (!currentParticipant.value) {
-            throw new Error('No active chat');
+
+    // Send message
+    const sendMessage = async (text) => {
+
+        if (messageInput.value.trim()) {
+            if (!currentParticipant.value) {
+                throw new Error('No active chat');
+            }
+
+            const socketStore = useSocketStore();
+            try {
+                socketStore.sendMessage(currentParticipant.value.id, text);
+            } catch (err) {
+                console.error('Error sending message:', err);
+                throw err;
+            }
+
+            messageInput.value = '';
         }
-        
-        const socketStore = useSocketStore();
-        try {
-            socketStore.sendMessage(currentParticipant.value.id, text);
-        } catch (err) {
-            console.error('Error sending message:', err);
-            throw err;
+    };
+
+
+    // Edit message
+    const editMessage = (messageId, newText) => {
+        if (newText.trim()) {
+            socketStore.editMessage(messageId, newText.trim());
         }
+        messageInput.value = "";
+        editingMessage.value = null;
+    };
+
+    // Delete message
+    const deleteMessage = (messageId) => {
+        const index = messages.value.findIndex(m => m.id === messageId);
+        if (index !== -1) {
+            // Either remove it or mark as deleted
+            messages.value[index].isDeleted = true;
+            messages.value[index].text = 'This message was deleted';
+        }
+        socketStore.deleteMessage(messageId);
     };
 
     return {
         currentRoom,
         currentParticipant,
-        messages: computed(() => messages.value),
+        messages,
+        messageInput,
+        editingMessage,
         typingUsers: computed(() => typingUsers.value),
         loading: computed(() => loading.value),
         error: computed(() => error.value),
@@ -122,6 +145,7 @@ export const useChatStore = defineStore('chat', () => {
         addMessage,
         updateMessage,
         deleteMessage,
+        editMessage,
         setTyping,
         isTyping,
         clearChat,

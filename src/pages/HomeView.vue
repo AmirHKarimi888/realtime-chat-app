@@ -19,7 +19,7 @@ const { currentParticipant } = storeToRefs(chatStore);
             <Chats />
         </div>
 
-        <div :class="currentParticipant ? 'max-sm:block' : 'max-sm:hidden'" class="w-full sm:w-1/2 md:w-2/3 lg:w-3/4">
+        <div :class="currentParticipant ? 'max-sm:block' : 'max-sm:hidden'" class="max-sm:w-full sm:w-1/2 md:w-2/3 lg:w-3/4">
             <ChatRoom />
         </div>
     </div>

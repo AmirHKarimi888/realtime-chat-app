@@ -62,7 +62,7 @@ const handleInput = () => {
                 </span>
 
                 <span>
-                    <img :src="currentParticipant.avatar ? `${httpService.url}${currentParticipant?.avatar}` : `${httpService.url}${currentParticipant?.defaultAvatar}`"
+                    <img :src="currentParticipant.avatar ? `${httpService.url}${currentParticipant?.avatar}` : `${currentParticipant?.defaultAvatar}`"
                         alt="avatar" class="w-[35px] aspect-square rounded-full">
                 </span>
                 <span>

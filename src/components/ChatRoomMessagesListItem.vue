@@ -36,10 +36,10 @@ const startEditingMessage = () => {
     <li v-if="!message.isDeleted" class="flex items-end gap-2">
         <div>
             <img v-if="message.from === signedInUser.id"
-                :src="signedInUser.avatar ? `${httpService.url}${signedInUser?.avatar}` : `${httpService.url}${signedInUser?.defaultAvatar}`"
+                :src="signedInUser.avatar ? `${httpService.url}${signedInUser?.avatar}` : `${signedInUser?.defaultAvatar}`"
                 alt="avatar" class="w-[35px] aspect-square rounded-full">
             <img v-if="message.from === currentParticipant.id"
-                :src="currentParticipant.avatar ? `${httpService.url}${currentParticipant?.avatar}` : `${httpService.url}${currentParticipant?.defaultAvatar}`"
+                :src="currentParticipant.avatar ? `${httpService.url}${currentParticipant?.avatar}` : `${currentParticipant?.defaultAvatar}`"
                 alt="avatar" class="w-[35px] aspect-square rounded-full">
         </div>
         <div class="p-2 rounded-md rounded-bl-none w-fit h-fit flex flex-col gap-3 shadow-md"

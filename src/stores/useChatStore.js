@@ -118,7 +118,7 @@ export const useChatStore = defineStore('chat', () => {
                             })
                         })
                         .then(() => {
-                            setTimeout(loadRoomMessages(currentRoom.value?.roomId));
+                            setTimeout(loadRoomMessages(currentRoom.value?.roomId), 1000);
                         })
                 }
 

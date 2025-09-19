@@ -39,5 +39,5 @@ class HttpService {
 }
 
 // usage
-const httpService = new HttpService("https://realtime-chat-app-backend-exlo.onrender.com");
+const httpService = new HttpService("https://realtime-chat-app-backend-exlo.onrender.com/");
 export default httpService;

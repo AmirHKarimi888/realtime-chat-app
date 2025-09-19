@@ -44,7 +44,7 @@ const handleInput = () => {
 
 <template>
     <div
-        class="flex flex-col w-full h-screen bg-[url(../../src/assets/images/wallpaperLight.jpg)] dark:bg-[url(../../src/assets/images/wallpaperDark.jpg)]">
+        class="flex flex-col w-full h-screen bg-[url(assets/images/wallpaperLight.jpg)] dark:bg-[url(assets/images/wallpaperDark.jpg)]">
 
         <div class="w-full h-full flex flex-col justify-between items-center">
 

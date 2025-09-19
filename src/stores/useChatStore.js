@@ -1,7 +1,8 @@
-import { defineStore } from 'pinia';
+import { defineStore, storeToRefs } from 'pinia';
 import { ref, computed } from 'vue';
 import httpService from '@/server';
 import { useSocketStore } from './useSocketStore';
+import { useUsersStore } from './useUsersStore';
 
 export const useChatStore = defineStore('chat', () => {
     const currentRoom = ref(null);
@@ -14,6 +15,9 @@ export const useChatStore = defineStore('chat', () => {
     const error = ref(null);
 
     const socketStore = useSocketStore();
+
+    const usersStore = useUsersStore();
+    const { signedInUser, chatRooms } = storeToRefs(usersStore);
 
     // Load messages for a specific chat room
     const loadRoomMessages = async (roomId) => {
@@ -99,8 +103,25 @@ export const useChatStore = defineStore('chat', () => {
             }
 
             const socketStore = useSocketStore();
+
             try {
                 socketStore.sendMessage(currentParticipant.value.id, text);
+
+                if (!messages.value.length && !currentRoom.value) {
+
+                    usersStore.loadChatRooms()
+                        .then(() => {
+                            currentRoom.value = chatRooms.value.find(room => {
+                                if (room.participant.id === currentParticipant.value.id) {
+                                    return room;
+                                }
+                            })
+                        })
+                        .then(() => {
+                            setTimeout(loadRoomMessages(currentRoom.value?.roomId));
+                        })
+                }
+
             } catch (err) {
                 console.error('Error sending message:', err);
                 throw err;

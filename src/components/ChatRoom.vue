@@ -71,15 +71,15 @@ const handleInput = () => {
             </div>
 
             <div id="chatContainer" class="flex w-full h-full overflow-y-auto"
-                :class="messages.length ? 'justify-start items-start' : 'justify-center items-center'">
+                :class="messages.length && !messages.every(mes => mes.isDeleted ? true : false) ? 'justify-start items-start' : 'justify-center items-center'">
 
-                <span v-if="!currentParticipant && !messages.length"
+                <span v-if="!currentParticipant && (!messages.length || messages.every(mes => mes.isDeleted ? true : false))"
                     class="px-3 py-1 text-sm text-white bg-gray-700/40 rounded-full">Select a chat</span>
 
-                <span v-if="!messages.length"
-                    class="px-3 py-1 text-sm text-white bg-gray-700/40 rounded-full">No messages yet...</span>
+                <span v-if="!messages.length || messages.every(mes => mes.isDeleted ? true : false)" class="px-3 py-1 text-sm text-white bg-gray-700/40 rounded-full">No
+                    messages yet...</span>
 
-                <div v-if="currentParticipant && messages.length">
+                <div v-if="currentParticipant && (messages.length && !messages.every(mes => mes.isDeleted ? true : false))">
                     <ChatRoomMessagesList :messages="messages" />
                 </div>
 
@@ -96,9 +96,13 @@ const handleInput = () => {
 
             <div v-if="currentParticipant"
                 class="w-full min-h-10 flex bg-white dark:bg-gray-700 border-s border-t border-gray-300 dark:border-gray-800">
-                <textarea @keyup.ctrl.enter="!editingMessage ? chatStore.sendMessage(messageInput) : chatStore.editMessage(editingMessage.id, messageInput)" class="w-full min-h-10 resize-none" type="text"
-                    v-model="messageInput" @input="handleInput" aria></textarea>
-                <button @click="!editingMessage ? chatStore.sendMessage(messageInput) : chatStore.editMessage(editingMessage.id, messageInput)" class="p-3 cursor-pointer">
+                <textarea
+                    @keyup.ctrl.enter="!editingMessage ? chatStore.sendMessage(messageInput) : chatStore.editMessage(editingMessage.id, messageInput)"
+                    class="w-full min-h-10 resize-none" type="text" v-model="messageInput" @input="handleInput"
+                    aria></textarea>
+                <button
+                    @click="!editingMessage ? chatStore.sendMessage(messageInput) : chatStore.editMessage(editingMessage.id, messageInput)"
+                    class="p-3 cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                         viewBox="0 0 24 24"><!-- Icon from Google Material Icons by Material Design Authors - https://github.com/material-icons/material-icons/blob/master/LICENSE -->
                         <path fill="currentColor" d="M2.01 21L23 12L2.01 3L2 10l15 2l-15 2z" />

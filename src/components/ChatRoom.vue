@@ -83,7 +83,7 @@ const handleInput = () => {
                     <ChatRoomMessagesList :messages="messages" />
                 </div>
 
-                <div
+                <div v-if="currentParticipant && (messages.length || !messages.every(mes => mes.isDeleted ? true : false))"
                     class="fixed bottom-15 right-3 w-8 h-8 flex justify-center items-center cursor-pointer rounded-full bg-white dark:bg-gray-700">
                     <button @click="scrollChatToBottom" class="cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"

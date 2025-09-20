@@ -96,38 +96,45 @@ export const useChatStore = defineStore('chat', () => {
 
     // Send message
     const sendMessage = async (text) => {
+        if (!text.trim()) return;
 
-        if (messageInput.value.trim()) {
-            if (!currentParticipant.value) {
-                throw new Error('No active chat');
-            }
+        if (!currentParticipant.value) {
+            throw new Error('No active chat');
+        }
 
-            const socketStore = useSocketStore();
+        const socketStore = useSocketStore();
 
-            try {
-                socketStore.sendMessage(currentParticipant.value.id, text);
+        try {
+            // Send the message via Socket.IO
+            socketStore.sendMessage(currentParticipant.value.id, text);
 
-                if (!messages.value.length && !currentRoom.value) {
+            // If this is the first message to this user
+            if (!messages.value.length && !currentRoom.value) {
+                // Wait for the backend to create the room
+                await new Promise(resolve => setTimeout(resolve, 500));
 
-                    usersStore.loadChatRooms()
-                        .then(() => {
-                            currentRoom.value = chatRooms.value.find(room => {
-                                if (room.participant.id === currentParticipant.value.id) {
-                                    return room;
-                                }
-                            })
-                        })
-                        .then(() => {
-                            setTimeout(loadRoomMessages(currentRoom.value?.roomId), 1000);
-                        })
+                // Reload chat rooms to get the newly created room
+                await usersStore.loadChatRooms();
+
+                // Find the room for this participant
+                currentRoom.value = chatRooms.value.find(room =>
+                    room.participant.id === currentParticipant.value.id
+                );
+
+                if (currentRoom.value) {
+                    // Load messages for the room
+                    await loadRoomMessages(currentRoom.value.roomId);
+                    console.log("Room created and messages loaded");
+                } else {
+                    console.warn("Room not found after message send");
                 }
-
-            } catch (err) {
-                console.error('Error sending message:', err);
-                throw err;
             }
 
             messageInput.value = '';
+
+        } catch (err) {
+            console.error('Error sending message:', err);
+            throw err;
         }
     };
 

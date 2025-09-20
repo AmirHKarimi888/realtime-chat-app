@@ -76,7 +76,7 @@ const handleInput = () => {
                 <span v-if="!currentParticipant && (!messages.length || messages.every(mes => mes.isDeleted ? true : false))"
                     class="px-3 py-1 text-sm text-white bg-gray-700/40 rounded-full">Select a chat</span>
 
-                <span v-if="!messages.length || messages.every(mes => mes.isDeleted ? true : false)" class="px-3 py-1 text-sm text-white bg-gray-700/40 rounded-full">No
+                <span v-if="currentParticipant && (!messages.length || messages.every(mes => mes.isDeleted ? true : false))" class="px-3 py-1 text-sm text-white bg-gray-700/40 rounded-full">No
                     messages yet...</span>
 
                 <div v-if="currentParticipant && (messages.length && !messages.every(mes => mes.isDeleted ? true : false))">
